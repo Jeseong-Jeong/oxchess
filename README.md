@@ -58,6 +58,8 @@ python analysis/line.py          # 최적 수순, 실력 차이에 따른 승률
 python analysis/variants2.py     # 선후공 교체, 하우스룰 확장
 node analysis/ai_levels.js       # AI 단계끼리 대전 승률표
 node analysis/test_god.js        # 신(P1)이 절대 안 지는지: 300판씩 + P2 모든 수순 전수 검사
+node analysis/human_rules.js     # 사람용 단순 규칙(반대로 두기 등)의 실전 승률
+node analysis/opening_exceptions.js  # "기본 규칙 + 예외 목록" 오프닝과 그 승률
 ```
 
 요약 (완벽한 플레이 기준):
