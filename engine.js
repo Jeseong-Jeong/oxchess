@@ -193,24 +193,52 @@
     return wins / n;
   }
 
-  // level: 'easy' | 'normal' | 'hard'
+  // 몇 수(한 글자 = 1수) 앞까지만 읽는 탐색. 값은 me 관점: 빨리 이길수록 크고, 늦게 질수록 덜 나쁨. 못 본 곳은 0.
+  function lookahead(g, depth, me) {
+    if (g.res !== null) return g.res === 0 ? 0 : (g.res === me ? 100 - g.n : g.n - 100);
+    if (depth === 0) return 0;
+    const mine = (g.turn === 0 ? 1 : -1) === me;
+    let best = mine ? -Infinity : Infinity;
+    for (const b of [O, X]) {
+      g.play(b);
+      const v = lookahead(g, depth - 1, me);
+      g.undo();
+      best = mine ? Math.max(best, v) : Math.min(best, v);
+    }
+    return best;
+  }
+
+  function lookaheadMove(g, depth, me, pick) {
+    const score = {};
+    for (const b of [O, X]) { g.play(b); score[CH[b]] = lookahead(g, depth - 1, me); g.undo(); }
+    if (score.O === score.X) return pick(['O', 'X']);
+    return score.O > score.X ? 'O' : 'X';
+  }
+
+  // 난이도: 몇 수 앞을 보는가
+  const LEVELS = {
+    novice: { name: '하수', note: '1수 앞만 봐요. 바로 지는 수는 피하지만 그다음은 몰라요.' },
+    mid: { name: '중수', note: '3~4수 앞을 보지만 가끔 실수해요.' },
+    expert: { name: '고수', note: '5~6수 앞을 보고 실수하지 않아요.' },
+    god: { name: '신', note: '끝까지 전부 계산해요. 이길 수 있는 판은 절대 놓치지 않아요.' },
+  };
+  const MID_MISTAKE = 0.2;
+
   function chooseMove(g, solver, level, rng = Math.random) {
     const me = g.turn === 0 ? 1 : -1;
     const pv = g.preview();
-    const winNow = ['O', 'X'].filter(c => pv[c].res === me);
     const safe = ['O', 'X'].filter(c => pv[c].res !== -me);
     const pick = arr => arr[Math.floor(rng() * arr.length)];
 
-    if (level === 'easy') {
-      if (winNow.length && rng() < 0.7) return winNow[0];
-      if (safe.length && rng() < 0.6) return pick(safe);
-      return pick(['O', 'X']);
+    if (level === 'novice') return lookaheadMove(g, 1, me, pick);
+    if (level === 'mid') {
+      // 실수: 수읽기를 건너뛰고 감으로 둠 (바로 지는 수만은 피함)
+      if (rng() < MID_MISTAKE) return pick(safe.length ? safe : ['O', 'X']);
+      return lookaheadMove(g, rng() < 0.5 ? 3 : 4, me, pick);
     }
+    if (level === 'expert') return lookaheadMove(g, rng() < 0.5 ? 5 : 6, me, pick);
 
-    if (winNow.length) return winNow[0];
-    // 보통: 가끔만 끝까지 읽고, 나머지는 바로 지는 수만 피해서 감으로 둠
-    if (level === 'normal' && rng() >= 0.3) return pick(safe.length ? safe : ['O', 'X']);
-
+    // 신: 끝까지 계산
     const ev = solver.evaluate(g);
     const good = ['O', 'X'].filter(c => ev[c] === me);
     if (good.length) return pick(good);
@@ -224,7 +252,7 @@
     return sO === sX ? pick(cands) : (sO > sX ? 'O' : 'X');
   }
 
-  const api = { MAXLEN, P3, P5, PRESETS, makeRules, Game, Solver, chooseMove, CH };
+  const api = { MAXLEN, P3, P5, PRESETS, LEVELS, makeRules, Game, Solver, chooseMove, CH };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.OX = api;
 })(typeof window !== 'undefined' ? window : globalThis);

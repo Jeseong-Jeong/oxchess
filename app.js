@@ -4,16 +4,22 @@
   const $ = sel => document.querySelector(sel);
   const $$ = sel => Array.from(document.querySelectorAll(sel));
   const SIDE = ['P1', 'P2'];
-  const LEVEL_NAME = { easy: '쉬움', normal: '보통', hard: '어려움' };
-  const LEVEL_NOTE = {
-    easy: '가끔 실수하는 초보 AI예요.',
-    normal: '바로 지는 수는 피하고, 가끔 끝까지 읽어요.',
-    hard: '모든 경우를 끝까지 계산해요. 한 번이라도 실수하면 집니다.',
-  };
+  const levelName = lv => (OX.LEVELS[lv] || OX.LEVELS.mid).name;
+  function levelNote(lv, rulesKey) {
+    let note = OX.LEVELS[lv].note;
+    if (lv === 'god') {
+      // 완전 탐색 결과: 기본 규칙은 P1 필승, 밸런스 패치는 P2 필승
+      note += rulesKey === 'balance' ? ' 이 규칙에서는 P2를 잡으면 절대 지지 않아요.' : ' 이 규칙에서는 P1을 잡으면 절대 지지 않아요.';
+    }
+    return note;
+  }
 
   // ---------- 설정 (기기에 저장) ----------
-  const opts = { aiSide: '0', aiLevel: 'normal', rules: 'classic', hints: true, hostSide: 'r' };
+  const opts = { aiSide: '0', aiLevel: 'mid', rules: 'classic', hints: true, hostSide: 'r' };
   try { Object.assign(opts, JSON.parse(localStorage.getItem('oxchess-opts') || '{}')); } catch (e) {}
+  // 예전 3단계 난이도 저장값 변환
+  opts.aiLevel = { easy: 'novice', normal: 'mid', hard: 'god' }[opts.aiLevel] || opts.aiLevel;
+  if (!OX.LEVELS[opts.aiLevel]) opts.aiLevel = 'mid';
   function saveOpts() { try { localStorage.setItem('oxchess-opts', JSON.stringify(opts)); } catch (e) {} }
 
   // ---------- 상태 ----------
@@ -23,7 +29,7 @@
     game: null,
     solver: null,
     mySide: 0,           // ai / online에서 내 진영
-    level: 'normal',
+    level: 'mid',
     busy: false,         // AI 생각 중
     aiTimer: null,
     resultShown: false,
@@ -55,8 +61,10 @@
   // ---------- 설정 UI ----------
   function syncSeg(name) {
     $$(`.seg[data-name="${name}"] button`).forEach(b => b.classList.toggle('on', b.dataset.v === String(opts[name])));
-    const note = $(`[data-note="${name}"]`);
-    if (note && name === 'aiLevel') note.textContent = LEVEL_NOTE[opts.aiLevel];
+    if (name === 'aiLevel' || name === 'rules') {
+      const note = $('[data-note="aiLevel"]');
+      if (note) note.textContent = levelNote(opts.aiLevel, opts.rules);
+    }
   }
   $$('.seg').forEach(seg => {
     const name = seg.dataset.name;
@@ -144,7 +152,7 @@
   }
 
   function nameOf(side) {
-    if (S.mode === 'ai') return side === S.mySide ? '나' : `AI · ${LEVEL_NAME[S.level]}`;
+    if (S.mode === 'ai') return side === S.mySide ? '나' : `AI · ${levelName(S.level)}`;
     if (S.mode === 'online') return side === S.mySide ? '나' : '상대';
     return '';
   }

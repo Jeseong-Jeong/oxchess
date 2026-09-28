@@ -1,5 +1,5 @@
 // 오프라인 지원: 앱 파일은 네트워크 우선(새 버전 바로 반영), 안 되면 캐시.
-const CACHE = 'oxchess-v1';
+const CACHE = 'oxchess-v2';
 const SHELL = ['./', 'index.html', 'style.css', 'engine.js', 'net.js', 'app.js', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {
