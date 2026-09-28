@@ -354,6 +354,11 @@
       badge.hidden = false;
       badge.textContent = S.online.connected ? '● 연결됨' : '● 끊김';
       badge.className = 'bar-right ' + (S.online.connected ? 'ok' : 'bad');
+    } else if (S.mode === 'ai') {
+      const lv = OX.LEVELS[S.level] || OX.LEVELS.mid;
+      badge.hidden = false;
+      badge.textContent = `🤖 ${lv.name} · ${lv.depth}`;
+      badge.className = 'bar-right';
     } else badge.hidden = true;
   }
 
