@@ -357,7 +357,7 @@
     } else if (S.mode === 'ai') {
       const lv = OX.LEVELS[S.level] || OX.LEVELS.mid;
       badge.hidden = false;
-      badge.textContent = `🤖 ${lv.name} · ${lv.depth}`;
+      badge.textContent = `🤖 ${lv.name}`;
       badge.className = 'bar-right';
     } else badge.hidden = true;
   }
