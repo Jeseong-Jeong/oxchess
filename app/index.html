@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>OX체스</title>
+  <meta name="description" content="O와 X만으로 두는 두뇌 게임. AI 대전, 같이 하기, 온라인 대전.">
+  <meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#16171b" media="(prefers-color-scheme: dark)">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="app">
+
+    <!-- 홈 -->
+    <section id="screen-home" class="screen">
+      <div class="home-hero">
+        <div class="logo" aria-hidden="true"><span class="lo">O</span><span class="lx">X</span></div>
+        <h1>OX체스</h1>
+        <p class="tagline">O와 X, 딱 두 글자로 두는 수 싸움</p>
+      </div>
+      <div class="menu">
+        <button class="menu-btn" data-go="setup-ai">
+          <span class="menu-ico" aria-hidden="true">🤖</span>
+          <span><b>AI 대전</b><small>쉬움 · 보통 · 어려움</small></span>
+        </button>
+        <button class="menu-btn" data-go="setup-local">
+          <span class="menu-ico" aria-hidden="true">👥</span>
+          <span><b>같이 하기</b><small>한 기기로 번갈아 두기</small></span>
+        </button>
+        <button class="menu-btn" data-go="online">
+          <span class="menu-ico" aria-hidden="true">🌐</span>
+          <span><b>온라인 대전</b><small>방 코드로 친구와 원격 대결</small></span>
+        </button>
+        <button class="menu-btn ghost" data-go="rules">
+          <span class="menu-ico" aria-hidden="true">📖</span>
+          <span><b>규칙</b><small>1분이면 다 읽어요</small></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- AI 설정 -->
+    <section id="screen-setup-ai" class="screen" hidden>
+      <header class="bar"><button class="back" data-go="home" aria-label="뒤로">‹</button><h2>AI 대전</h2></header>
+      <div class="form">
+        <fieldset>
+          <legend>내 진영</legend>
+          <div class="seg" data-name="aiSide">
+            <button data-v="0" class="on"><b class="p1c">P1</b><small>선공 · 5글자</small></button>
+            <button data-v="1"><b class="p2c">P2</b><small>후공 · 3글자</small></button>
+            <button data-v="r"><b>랜덤</b><small>&nbsp;</small></button>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>난이도</legend>
+          <div class="seg" data-name="aiLevel">
+            <button data-v="easy"><b>쉬움</b></button>
+            <button data-v="normal" class="on"><b>보통</b></button>
+            <button data-v="hard"><b>어려움</b></button>
+          </div>
+          <p class="note" data-note="aiLevel"></p>
+        </fieldset>
+        <fieldset>
+          <legend>규칙</legend>
+          <div class="seg" data-name="rules">
+            <button data-v="classic" class="on"><b>기본 규칙</b><small>OOO·XXX 3회</small></button>
+            <button data-v="balance"><b>밸런스 패치</b><small>+ OXO·XOX 3회</small></button>
+          </div>
+        </fieldset>
+        <label class="check"><input type="checkbox" data-name="hints" checked> 위험한 수 알려주기 (체크 표시)</label>
+        <button class="primary" id="start-ai">시작</button>
+      </div>
+    </section>
+
+    <!-- 같이 하기 설정 -->
+    <section id="screen-setup-local" class="screen" hidden>
+      <header class="bar"><button class="back" data-go="home" aria-label="뒤로">‹</button><h2>같이 하기</h2></header>
+      <div class="form">
+        <p class="note">한 기기를 둘이 번갈아 가며 씁니다. 파랑이 P1, 초록이 P2예요.</p>
+        <fieldset>
+          <legend>규칙</legend>
+          <div class="seg" data-name="rules">
+            <button data-v="classic" class="on"><b>기본 규칙</b><small>OOO·XXX 3회</small></button>
+            <button data-v="balance"><b>밸런스 패치</b><small>+ OXO·XOX 3회</small></button>
+          </div>
+        </fieldset>
+        <label class="check"><input type="checkbox" data-name="hints" checked> 위험한 수 알려주기 (체크 표시)</label>
+        <button class="primary" id="start-local">시작</button>
+      </div>
+    </section>
+
+    <!-- 온라인 -->
+    <section id="screen-online" class="screen" hidden>
+      <header class="bar"><button class="back" data-go="home" aria-label="뒤로">‹</button><h2>온라인 대전</h2></header>
+      <div class="form" id="online-lobby">
+        <div class="card">
+          <h3>방 만들기</h3>
+          <fieldset>
+            <legend>내 진영</legend>
+            <div class="seg" data-name="hostSide">
+              <button data-v="0"><b class="p1c">P1</b><small>선공 · 5글자</small></button>
+              <button data-v="1"><b class="p2c">P2</b><small>후공 · 3글자</small></button>
+              <button data-v="r" class="on"><b>랜덤</b><small>&nbsp;</small></button>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>규칙</legend>
+            <div class="seg" data-name="rules">
+              <button data-v="classic" class="on"><b>기본 규칙</b><small>OOO·XXX 3회</small></button>
+              <button data-v="balance"><b>밸런스 패치</b><small>+ OXO·XOX 3회</small></button>
+            </div>
+          </fieldset>
+          <button class="primary" id="host-btn">방 만들기</button>
+        </div>
+        <div class="card">
+          <h3>방 참가</h3>
+          <div class="join-row">
+            <input id="join-code" inputmode="text" autocomplete="off" autocapitalize="characters" maxlength="5" placeholder="방 코드 5자리" aria-label="방 코드">
+            <button class="primary" id="join-btn">참가</button>
+          </div>
+        </div>
+        <p class="note">서버 없이 두 기기를 직접 연결해요(WebRTC). 일부 회사·학교 와이파이나 통신망에서는 연결이 안 될 수 있어요.</p>
+      </div>
+      <div class="form" id="online-wait" hidden>
+        <div class="card center">
+          <p class="muted">친구에게 이 코드를 알려주세요</p>
+          <div class="room-code" id="room-code">-----</div>
+          <div class="row">
+            <button class="secondary" id="share-btn">링크 공유</button>
+            <button class="secondary" id="copy-btn">코드 복사</button>
+          </div>
+          <p class="waiting"><span class="dot"></span> <span id="wait-msg">상대를 기다리는 중…</span></p>
+          <button class="link" id="cancel-host">취소</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 규칙 -->
+    <section id="screen-rules" class="screen" hidden>
+      <header class="bar"><button class="back" data-go="home" aria-label="뒤로">‹</button><h2>규칙</h2></header>
+      <article class="rules">
+        <h3>진행</h3>
+        <p><b class="p1c">P1</b>(선공)과 <b class="p2c">P2</b>가 번갈아 한 글자씩 <b>O</b> 또는 <b>X</b>를 놓습니다. 매번 둘 중 원하는 걸 고를 수 있고, 놓은 글자는 한 줄로 이어집니다(최대 40칸).</p>
+        <h3>승리 조건</h3>
+        <ul>
+          <li><b class="p1c">P1</b>: 같은 <b>5글자</b> 패턴이 <b>2번</b> 나오면 승리</li>
+          <li><b class="p2c">P2</b>: 같은 <b>3글자</b> 패턴이 <b>4번</b> 나오면 승리</li>
+          <li>하우스룰: <code>OOO</code>, <code>XXX</code>는 <b>3번</b>만 나와도 P2 승리<br><span class="muted">밸런스 패치 규칙에서는 <code>OXO</code>, <code>XOX</code>도 3번</span></li>
+          <li>두 조건이 동시에 만족되면 P2 승리</li>
+          <li>40칸이 다 차면 무승부</li>
+        </ul>
+        <h3>세는 법</h3>
+        <p>패턴 사이에 다른 글자가 있어도 됩니다. 다만 겹치지 않게 왼쪽부터 셉니다.</p>
+        <p class="ex"><code>OOOOOO</code> → OOO 2번 · <code>OOOO</code> → OOO 1번</p>
+        <h3>체크 / 체크메이트</h3>
+        <p><b>체크</b>: 지금 차례인 사람이 O나 X 중 한쪽을 두면 상대가 이기는 상태.<br><b>체크메이트</b>: 뭘 둬도 상대가 이기는 상태.</p>
+        <p class="muted">중요: 자기가 놓은 글자로 상대 조건이 완성돼도 상대가 이깁니다. 두 사람이 한 줄을 같이 쓰는 게임이에요.</p>
+      </article>
+    </section>
+
+    <!-- 게임 -->
+    <section id="screen-game" class="screen" hidden>
+      <header class="bar">
+        <button class="back" id="game-back" aria-label="나가기">‹</button>
+        <h2 id="game-title">OX체스</h2>
+        <span class="bar-right" id="conn-badge" hidden></span>
+      </header>
+
+      <div class="players">
+        <div class="player p1" id="pl-1"><span class="pname" id="pname-1">P1</span><span class="pgoal">5글자 × 2</span></div>
+        <div class="vs">vs</div>
+        <div class="player p2" id="pl-2"><span class="pname" id="pname-2">P2</span><span class="pgoal">3글자 × 4</span></div>
+      </div>
+
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+
+      <div class="board" id="board" aria-label="판"></div>
+
+      <div class="controls">
+        <button class="play-btn o" id="btn-o" aria-label="O 두기">O<span class="warn" id="warn-o"></span></button>
+        <button class="play-btn x" id="btn-x" aria-label="X 두기">X<span class="warn" id="warn-x"></span></button>
+      </div>
+      <div class="subcontrols">
+        <button class="link" id="undo-btn">↶ 무르기</button>
+        <button class="link" id="hint-toggle"></button>
+      </div>
+
+      <div class="goals">
+        <div class="goal">
+          <div class="goal-h"><b class="p2c">P2 목표</b> <span class="muted">같은 3글자 패턴 반복</span></div>
+          <div class="chips" id="chips3"></div>
+        </div>
+        <div class="goal">
+          <div class="goal-h"><b class="p1c">P1 목표</b> <span class="muted">같은 5글자 패턴 2번</span></div>
+          <div class="chips" id="chips5"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 결과 -->
+  <div class="modal" id="result" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="result-title">
+      <div class="result-emoji" id="result-emoji"></div>
+      <h2 id="result-title"></h2>
+      <p id="result-reason" class="muted"></p>
+      <div class="analysis" id="result-analysis"></div>
+      <div class="sheet-btns">
+        <button class="primary" id="again-swap">진영 바꿔서 한 판 더</button>
+        <button class="secondary" id="again-same">같은 진영으로</button>
+        <button class="link" id="result-board">판 보기</button>
+        <button class="link" id="result-home">홈으로</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="engine.js"></script>
+  <script src="net.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
