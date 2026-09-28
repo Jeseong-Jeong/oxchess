@@ -100,6 +100,7 @@
 
   function stopGame() {
     clearTimeout(S.aiTimer);
+    clearInterval(S.stateTimer);
     S.busy = false;
     if (S.room) {
       S.room.send({ t: 'bye' });
@@ -453,7 +454,13 @@
       },
       onConnect: () => {
         S.online.connected = true;
-        if (S.online.role === 'host') hostStartGame(true);
+        if (S.online.role === 'host') {
+          hostStartGame(true);
+          clearInterval(S.stateTimer);
+          S.stateTimer = setInterval(() => {
+            if (S.room && S.game && S.mode === 'online') S.room.send({ t: 'state', moves: S.game.str });
+          }, 4000);
+        }
         else { toast('연결됐어요!'); if (S.mode === 'online') render(); }
       },
       onData: onNetData,
@@ -512,6 +519,16 @@
       case 'sync':
         if (S.online.role === 'host') S.room.send({ t: 'start', rules: S.rulesKey, guestSide: 1 - S.mySide, moves: g.str });
         break;
+      case 'state': {
+        // 호스트가 주기적으로 보내는 판 상태. 중간에 메시지가 빠졌으면 여기서 다시 맞춘다.
+        if (S.online.role !== 'guest' || !g || S.mode !== 'online' || typeof msg.moves !== 'string') return;
+        const mine = g.str;
+        if (mine === msg.moves) break;
+        if (mine.length === msg.moves.length + 1 && mine.startsWith(msg.moves) && (g.n - 1) % 2 === S.mySide) {
+          S.room.send({ t: 'move', n: g.n, c: mine[mine.length - 1] }); // 내 수가 안 갔음 → 다시 보냄
+        } else S.room.send({ t: 'sync' });
+        break;
+      }
       case 'rematch':
         if (S.online.role !== 'host') return;
         toast('상대가 한 판 더를 원해요!');
