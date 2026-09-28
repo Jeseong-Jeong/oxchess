@@ -66,5 +66,37 @@ if (!ok) failed = true;
 console.log(`   결과: ${ok ? '✓ P2가 어떻게 둬도 P1 승' : '✗ P1이 지는 수순 있음: ' + lossLine}`);
 console.log(`   확인한 국면 ${states.toLocaleString()}개, 끝난 판(메모 제외) ${leaves.toLocaleString()}개, 가장 긴 판 ${maxLen}수, ${Date.now() - t0}ms`);
 
+// 3) 반대로 신이 P2일 때: P1 난이도별 결과. P1이 졌다면 이기는 흐름을 처음 놓친 수가 몇 번째였는지 기록.
+for (const preset of ['classic', 'balance']) {
+  const r = OX.makeRules(preset);
+  const s = new OX.Solver(r);
+  console.log(`\n## 3. P1 각 난이도 vs 신(P2) ${N}판씩 — ${OX.PRESETS[preset].name}`);
+  for (const lv of ['god', 'expert', 'mid', 'novice', 'random']) {
+    let p1 = 0, p2 = 0, draw = 0;
+    const blunders = [];   // P1이 필승 → 필패로 바꾼 첫 수 번호
+    for (let t = 0; t < N; t++) {
+      const g = new OX.Game(r);
+      let first = null;
+      while (g.res === null) {
+        let c;
+        if (g.turn === 0) {
+          c = lv === 'random' ? (Math.random() < 0.5 ? 'O' : 'X') : OX.chooseMove(g, s, lv);
+          if (first === null) {
+            const ev = s.evaluate(g);
+            if ((ev.O === 1 || ev.X === 1) && ev[c] !== 1) first = g.n + 1;
+          }
+        } else c = OX.chooseMove(g, s, 'god');
+        g.play(bit(c));
+      }
+      if (g.res === 1) p1++; else if (g.res === -1) { p2++; if (first) blunders.push(first); } else draw++;
+    }
+    blunders.sort((a, b) => a - b);
+    const med = blunders.length ? blunders[blunders.length >> 1] : '-';
+    const early = blunders.filter(x => x <= 9).length;
+    console.log(`   P1 ${lv.padEnd(6)}: P1 승 ${String(p1).padStart(3)} / P2 승 ${String(p2).padStart(3)} / 무 ${draw}` +
+      (blunders.length ? `   · 처음 놓친 수 중앙값 ${med}번째, 9수 이내에 놓친 판 ${Math.round(early / blunders.length * 100)}%` : ''));
+  }
+}
+
 console.log(failed ? '\n❌ 실패' : '\n✅ 전부 통과');
 process.exit(failed ? 1 : 0);
