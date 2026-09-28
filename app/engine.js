@@ -217,12 +217,14 @@
 
   // 난이도: 몇 수 앞을 보는가
   const LEVELS = {
-    novice: { name: '하수', depth: '1수', note: '1수 앞만 봐요. 바로 지는 수는 피하지만 그다음은 몰라요.' },
+    novice: { name: '하수', depth: '2수', note: '2수 앞까지 보지만 자주 실수해요.' },
     mid: { name: '중수', depth: '3~4수', note: '3~4수 앞을 보지만 가끔 실수해요.' },
     expert: { name: '고수', depth: '5~6수', note: '5~6수 앞을 보고 실수하지 않아요.' },
     god: { name: '신', depth: '끝까지', note: '끝까지 전부 계산해요. 이길 수 있는 판은 절대 놓치지 않아요.' },
   };
-  const MID_MISTAKE = 0.2;
+  // 실수 = 그 수에서는 1수 앞(바로 지는 수 피하기)만 보고 둠. 단계 간격이 고르도록 대전 통계로 맞춘 값 (analysis/ai_levels.js)
+  const NOVICE_MISTAKE = 0.3;
+  const MID_MISTAKE = 0.1;
 
   function chooseMove(g, solver, level, rng = Math.random) {
     const me = g.turn === 0 ? 1 : -1;
@@ -230,10 +232,12 @@
     const safe = ['O', 'X'].filter(c => pv[c].res !== -me);
     const pick = arr => arr[Math.floor(rng() * arr.length)];
 
-    if (level === 'novice') return lookaheadMove(g, 1, me, pick);
+    if (level === 'novice') {
+      if (rng() < NOVICE_MISTAKE) return lookaheadMove(g, 1, me, pick);
+      return lookaheadMove(g, 2, me, pick);
+    }
     if (level === 'mid') {
-      // 실수: 수읽기를 건너뛰고 감으로 둠 (바로 지는 수만은 피함)
-      if (rng() < MID_MISTAKE) return pick(safe.length ? safe : ['O', 'X']);
+      if (rng() < MID_MISTAKE) return lookaheadMove(g, 1, me, pick);
       return lookaheadMove(g, rng() < 0.5 ? 3 : 4, me, pick);
     }
     if (level === 'expert') return lookaheadMove(g, rng() < 0.5 ? 5 : 6, me, pick);

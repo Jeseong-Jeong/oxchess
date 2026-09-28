@@ -1,11 +1,12 @@
 // AI 난이도 검증: 각 단계끼리 붙여서 실력 순서가 맞는지 확인.  node analysis/ai_levels.js
 const OX = require('../app/engine.js');
 
-const LEVELS = ['random', 'novice', 'mid', 'expert', 'god'];
+const LEVELS = ['random', 'onlyO', 'novice', 'mid', 'expert', 'god'];
 const N = +process.argv[2] || 400;
 
 function move(g, s, lvl) {
   if (lvl === 'random') return Math.random() < 0.5 ? 'O' : 'X';
+  if (lvl === 'onlyO') return 'O';
   return OX.chooseMove(g, s, lvl);
 }
 
