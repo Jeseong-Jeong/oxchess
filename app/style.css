@@ -257,3 +257,10 @@ legend { font-weight: 700; margin-bottom: 8px; font-size: 15px; }
   .board { gap: 3px; padding: 6px; }
   .play-btn { height: 66px; }
 }
+
+.update-bar {
+  position: fixed; left: 50%; top: max(12px, env(safe-area-inset-top)); transform: translateX(-50%); z-index: 30;
+  display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 16px; border-radius: 99px;
+  background: var(--text); color: var(--bg); font-size: 14px; box-shadow: var(--shadow); white-space: nowrap;
+}
+.update-bar button { border: 0; border-radius: 99px; padding: 6px 12px; font-weight: 700; background: var(--next); color: #1c1d21; }

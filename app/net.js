@@ -108,7 +108,7 @@
       this._raw({ t: 'hello' });
       clearTimeout(this.joinTimer);
       this.joinTimer = setTimeout(() => {
-        if (!this._connected) this.h.onError && this.h.onError('방을 찾을 수 없어요. 코드를 다시 확인해 주세요.');
+        if (!this._connected) this.h.onError && this.h.onError('방을 찾을 수 없어요. 코드를 확인하고, 방을 만든 쪽도 앱을 새로고침한 뒤 다시 만들어 주세요.');
       }, JOIN_TIMEOUT_MS);
     }
 
