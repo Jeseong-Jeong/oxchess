@@ -623,4 +623,24 @@
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
+
+  // ---------- 새 버전 확인 ----------
+  // 폰에서 앱을 켜 둔 채로 두면 예전 버전이 계속 돌아서, 상대와 버전이 달라 온라인 대전이 안 붙을 수 있다.
+  const APP_VERSION = ((document.querySelector('script[src*="app.js"]') || {}).src || '').match(/v=(\d+)/)?.[1];
+  let updateShown = false;
+  async function checkUpdate() {
+    if (!APP_VERSION || updateShown || location.protocol === 'file:') return;
+    try {
+      const html = await (await fetch('index.html?check=' + Date.now(), { cache: 'no-store' })).text();
+      const latest = (html.match(/app\.js\?v=(\d+)/) || [])[1];
+      if (!latest || latest === APP_VERSION) return;
+      if ($('#screen-game').hidden) { location.reload(); return; } // 게임 중이 아니면 바로 새 버전으로
+      updateShown = true;
+      $('#update-bar').hidden = false;
+    } catch (e) {}
+  }
+  $('#update-btn').addEventListener('click', () => location.reload());
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkUpdate(); });
+  setInterval(checkUpdate, 5 * 60 * 1000);
+  setTimeout(checkUpdate, 1500);
 })();
