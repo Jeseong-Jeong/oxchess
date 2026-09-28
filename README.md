@@ -41,7 +41,7 @@ git push origin `git subtree split --prefix app main`:refs/heads/gh-pages --forc
 
 다른 곳에 올릴 때도 `app/` 폴더를 정적 호스팅에 그대로 올리면 된다(온라인 대전은 HTTPS 필요).
 
-앱 파일을 바꿔 배포할 때는 `app/sw.js`의 `CACHE` 이름(`oxchess-v3`)과 `app/index.html`의 `?v=3`을 같이 올린다. 그래야 폰에 예전 파일과 새 파일이 섞여 로딩되지 않는다.
+앱 파일을 바꿔 배포할 때는 `app/sw.js`의 `CACHE` 이름(`oxchess-v4`)과 `app/index.html`의 `?v=4`을 같이 올린다. 그래야 폰에 예전 파일과 새 파일이 섞여 로딩되지 않는다.
 
 ## 온라인 대전 방식과 한계
 
