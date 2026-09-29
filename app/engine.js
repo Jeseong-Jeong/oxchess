@@ -234,7 +234,9 @@
   };
   // 실수 = 그 수에서는 1수 앞(바로 지는 수 피하기)만 보고 둠. 단계 간격이 고르도록 대전 통계로 맞춘 값 (analysis/ai_levels.js)
   const NOVICE_MISTAKE = 0.3;
-  const NOVICE_NOTICE_REPEAT = 0.5; // 한 글자만 누르는 상대에게 하수 승률 약 85%
+  // 한 글자만 누르는 꼼수를 알아챌 확률. 꼼수 쪽이 P1(선공)일 때 하수 약 85%, 중수 약 90% 승리하도록 맞춘 값
+  const NOVICE_NOTICE_REPEAT = 0.8;
+  const MID_NOTICE_REPEAT = 0.5;
   const MID_MISTAKE = 0.1;
 
   function chooseMove(g, solver, level, rng = Math.random) {
@@ -244,13 +246,13 @@
     const pick = arr => arr[Math.floor(rng() * arr.length)];
 
     if (level === 'novice') {
-      // 상대가 한 글자만 계속 누르면(꼼수) 반쯤은 알아채고 그 수만 실수 없이 조금 더 멀리 본다
+      // 상대가 한 글자만 계속 누르면(꼼수) 대개 알아채고 그 수만 실수 없이 조금 더 멀리 본다
       if (opponentRepeats(g, 3) && rng() < NOVICE_NOTICE_REPEAT) return lookaheadMove(g, 3, me, pick);
       if (rng() < NOVICE_MISTAKE) return lookaheadMove(g, 1, me, pick);
       return lookaheadMove(g, 2, me, pick);
     }
     if (level === 'mid') {
-      if (opponentRepeats(g, 3)) return lookaheadMove(g, 4, me, pick);
+      if (opponentRepeats(g, 3) && rng() < MID_NOTICE_REPEAT) return lookaheadMove(g, 4, me, pick);
       if (rng() < MID_MISTAKE) return lookaheadMove(g, 1, me, pick);
       return lookaheadMove(g, rng() < 0.5 ? 3 : 4, me, pick);
     }
