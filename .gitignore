@@ -6,3 +6,6 @@
 ~$*
 
 __pycache__/
+
+# 드라이브 공유용으로 생성되는 폴더 (python tools/make_share.py)
+드라이브_업로드/

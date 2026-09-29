@@ -10,7 +10,10 @@ O와 X만으로 두는 2인 추상 전략 게임. 원래 엑셀(`OX체스.xlsx`,
 | `app/engine.js` | 규칙 엔진 + AI (완전 탐색). node에서도 `require` 가능 |
 | `app/net.js` | 온라인 대전 (공개 MQTT 중계 서버) |
 | `app/app.js` | 화면, 게임 진행, 결과 복기 |
-| `analysis/` | 밸런스 분석용 파이썬 솔버 |
+| `analysis/` | 밸런스·AI·전략 분석 스크립트 |
+| `excel/` | 엑셀 v3 생성 기록(`build_v3.py`), 엑셀 수식 검증(`verify_xlsx.py`) |
+| `docs/` | 사람용 문서: 규칙, 공략, 밸런스 분석, AI 난이도, 업데이트 방법, 문제 해결, 변경 이력 |
+| `tools/make_share.py` | 구글 드라이브 공유 폴더(`드라이브_업로드/OX체스/`) 생성 |
 
 ## 기능
 
